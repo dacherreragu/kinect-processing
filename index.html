@@ -119,7 +119,7 @@
 						<p><a href="https://processing.org/" target="_blank">Processing</a> is an open source programming language and environment for people who want to create images, animations, and interactions.</p>
 					</section>
 					<section>
-						<h2>START WITH INECT IN PROCESSING</h2>
+						<h2>START WITH KINECT IN PROCESSING</h2>
 						<p>The easiest way to install the library is with the <a href="https://processing.org/reference/environment/#Extensions" target="_blank">Processing Contributions Manager</a> Sketch → Import Libraries → Add library and search for “Kinect”. A button will appear labeled “install”.
 						<br>
 						Then, restart Processing.</p>
@@ -296,38 +296,103 @@
 						```
 					</section>
 				</section>
-
 				<section>
-					<section data-background="#dddddd">
-						<h2>Slide Backgrounds</h2>
-						<p>
-							Set <code>data-background="#dddddd"</code> on a slide to change the background color. All CSS color formats are supported.
-						</p>
-						<a href="#" class="navigate-down">
-							<img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
-						</a>
+					<section>
+						<h1>POINT CLOUD</h1>
 					</section>
-					<section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/image-placeholder.png">
-						<h2>Image Backgrounds</h2>
-						<pre><code class="hljs">&lt;section data-background="image.png"&gt;</code></pre>
-					</section>
-					<section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/image-placeholder.png" data-background-repeat="repeat" data-background-size="100px">
-						<h2>Tiled Backgrounds</h2>
-						<pre><code class="hljs" style="word-wrap: break-word;">&lt;section data-background="image.png" data-background-repeat="repeat" data-background-size="100px"&gt;</code></pre>
-					</section>
-					<section data-background-video="https://s3.amazonaws.com/static.slid.es/site/homepage/v1/homepage-video-editor.mp4,https://s3.amazonaws.com/static.slid.es/site/homepage/v1/homepage-video-editor.webm" data-background-color="#000000">
-						<div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
-							<h2>Video Backgrounds</h2>
-							<pre><code class="hljs" style="word-wrap: break-word;">&lt;section data-background-video="video.mp4,video.webm"&gt;</code></pre>
+					<section>
+						<h2>Overview</h2>
+						<p>We’re using the 3D capabilities of Processing to draw points in space.</p>
+						<div class="fragment">You’ll want to familiarize yourself with:</div>
+						<div class="fragment" data-markdown>
+							```
+								translate()
+								rotate()
+								pushMatrix()
+								popMatrix()
+							```
 						</div>
 					</section>
-					<section data-background="http://i.giphy.com/90F8aUepslB84.gif">
-						<h2>... and GIFs!</h2>
+					<section>
+						<h2>Raw depth values</h2>
+						<p>Rather than do this calculation all the time, we can precompute all of these values in a lookup table since there are only 2048 depth values.</p>
+						<div class="fragment" data-markdown>
+							```
+							depthInMeters = 1.0 / (rawDepth * -0.0030711016 + 3.3309495161);
+							```
+						</div>
+					</section>
+					<section>
+						<h2>Raw depth values</h2>
+						<p>The raw depth values from the kinect are not directly proportional to physical depth. Rather, they scale with the inverse of the depth according to this formula:</p>
+						<div class="fragment" data-markdown>
+							```
+							float[] depthLookUp = new float[2048];
+
+							for (int i = 0; i < depthLookUp.length; i++) {
+  								depthLookUp[i] = rawDepthToMeters(i);
+							}
+							float rawDepthToMeters(int depthValue) {
+  								if (depthValue < 2047) {
+    									return (float)(1.0 / ((double)(depthValue) * -0.0030711016 + 3.3309495161));
+  								}
+  								return 0.0f;
+							}
+							```
+						</div>
+					</section>
+					<section>
+						<h2>Raw depth values</h2>
+						<p>Thanks to <a href="http://graphics.stanford.edu/~mdfisher/Kinect.html" target="_blank">Matthew Fisher</a> for the above formula.</p>
+						<p><span class="fragment">Note:</span> <span class="fragment">For the results to be more accurate, you would need to calibrate your specific kinect device.</span></p>
+					</section>
+					<section>
+						<h2>Point cloud</h2>
+						<p>RFinally, we can draw some points based on the depth values in meters:</p>
+						<div class="fragment" data-markdown>
+							```
+							for(int x = 0; x < w; x += skip) {
+    								for(int y = 0; y < h; y += skip) {
+     							 		int offset = x + y * kinect.width;
+
+      									// Convert kinect data to world xyz coordinate
+      									int rawDepth = depth[offset];
+      									PVector v = depthToWorld(x, y, rawDepth);
+
+      									stroke(255);
+     									pushMatrix();
+      									// Scale up by 200
+     									float factor = 200;
+      									translate(v.x * factor, v.y * factor, factor-v.z * factor);
+      									// Draw a point
+      									point(0,0);
+      									popMatrix();
+    								}
+  							}
+							```
+						</div>
+					</section>
+					<section>
+						<h2>Obtained result</h2>
+						<img src="images/result.png">
+					</section>
+					<section>
+						<h2>Related video</h2>
+						<p>The following video is a great resource for this implementation:</p>
+						<iframe width="600" height="400" src="https://www.youtube.com/embed/E1eIg54clGo" frameborder="0" allowfullscreen class="fragment"></iframe>
 					</section>
 				</section>
-
+				<section>
+					<section>
+						<h2>References</h2>
+						<ul>
+							<li class="fragment"><a href="https://es.wikipedia.org/wiki/Kinect" target="_blank">Kinect</a></li>
+							<li class="fragment"><a href="https://processing.org/" target="_blank">Processing</a></li>
+							<li class="fragment"><a href="http://shiffman.net/p5/kinect/" target="_blank">Getting Started with Kinect and Processing</a></li>
+						</ul>
+					</section>
+				</section>
 			</div>
-
 		</div>
 
 		<script src="lib/js/head.min.js"></script>
