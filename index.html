@@ -69,7 +69,7 @@
 					<h2>INDEX</h2>
 					<ol>
 						<li class="fragment"><a href="#/3">Minority report photos</a></li>
-						<li class="fragment"><a href="#/4">Minority report photos</a></li>
+						<li class="fragment"><a href="#/4">Air Drum</a></li>
 					</ol>
 				</section>
 
@@ -199,6 +199,11 @@
 								<li> image1X and image1Y, which will hold the position
 									of our image and a Boolean called imageMoving, which will keep
 									track of whether or not the user has “dropped” the image.</li>
+							</ul>
+						</section>
+						<section>
+							<h2>1) HOW DOES THIS SKETCH WORK?</h2>
+							<ul>
 								<li>If image-Moving is true, clicking the mouse
 									will set it to false, and vice versa. That way the mouse button
 									will act to drop the image if the user is currently moving it
@@ -212,6 +217,11 @@
 									coordinates based on interpolatedX and interpolatedY.</li>
 								<li>We draw the image using those coordinates whether
 									or not it is currently being moved.</li>
+							</ul>
+						</section>
+						<section>
+							<h2>2) AFTER INTERPOLATE</h2>
+							<ul>
 								<li>If the image is being moved, image1X and image1Y
 									will always be set to the most recent values of interpolatedX and interpolatedY.</li>
 								<li> When you click the mouse and set imageMoving to false,
@@ -236,15 +246,17 @@
 						<section>
 							<h2>ADVANCED VERSION: MULTIPLE IMAGES AND SCALE</h2>
 							<p>Two changes.</p>
-							<ul>
-								<li>It’ll control multiple images. That change is not going to introduce
+							<p>1) It’ll control multiple images. That change is not going to introduce
 									any new concepts, but will simply be a matter of managing more variables
 									to keep track of the location of all of the images and remembering which
-									image the user is currently controlling.</li>
-								<li>We’ll give the user the ability to scale each image up and down by moving
+									image the user is currently controlling.</p>
+						</section>
+						<section>
+							<h2>ADVANCED VERSION: MULTIPLE IMAGES AND SCALE</h2>
+							<p>Two changes.</p>
+							<p>2) We’ll give the user the ability to scale each image up and down by moving
 									her hand closer to or farther from the Kinect. To do this, we’ll need to use
-									closestValue, the actual distance of the closest point detected in the image. </li>
-							</ul>
+									closestValue, the actual distance of the closest point detected in the image.</p>
 						</section>
 						<section data-markdown>
 							## CODE
@@ -385,6 +397,11 @@
 									<li>Once you’ve set up your images, you’ll be ready to run this sketch.
 										Set up your Kinect so that you’re three or four feet away from it and
 										there’s nothing between it and you.</li>
+								</ul>
+							</section>
+							<section>
+								<h2>1) HOW DOES THIS SKETCH WORK?</h2>
+								<ul>
 									<li>First, we’ll look at how this sketch works with multiple images. We’ll
 										see how it remembers where to position each image and how it decides which
 										image should be controlled by your current movements.</li>
@@ -421,6 +438,11 @@
 										in a width and a height</li>
 									<li>When the user is controlling an image, we’ll use the depth of the
 										closest pixel to scale these values up and down.</li>
+								</ul>
+							</section>
+							<section>
+								<h2>SIZE OF IMAGES</h2>
+								<ul>
 									<li>Only update the scale of the image that the user is actively controlling so the
 										other images will stick at whatever size the user left them.</li>
 									<li>When we call image, we’ll pass in the scaled values for each image’s width and
