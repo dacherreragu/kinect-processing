@@ -69,7 +69,7 @@
 					<h2>INDEX</h2>
 					<ol>
 						<li class="fragment"><a href="#/3">Minority report photos</a></li>
-						<li class="fragment"><a href="#/4">Air Drum</a></li>
+						<li class="fragment"><a href="#/4">Air drum kit</a></li>
 					</ol>
 				</section>
 
@@ -451,7 +451,353 @@
 							</section>
 					</section>
 					<section>
-
+						<section>
+							<h1>AIR DRUM KIT</h1>
+						</section>
+						<section>
+							<h2>OVERVIEW</h2>
+							<ul>
+								<li>How to play sound in Processing using the Minim library.
+								Then we’ll hook up these sounds to a series of hot points.</li>
+								<li>The idea of this project is to use our floating hot points to
+									make this kind of fantasy instrument playing come to life, to trigger
+									actual sounds when you hit make believe drums that only you can see.</li>
+							</ul>
+						</section>
+						<section>
+							<h2>HOW TO WORKS</h2>
+							<ul>
+								<li>We want to play a drum sound whenever the user sets off one of the hot points.
+									To accomplish that, I’ll show you how to use Minim, a popular library
+									for working with sound in Processing. </li>
+									<li>We need to control exactly when and how the sounds are triggered. We want
+										the drum sound to play just when the first part of the point cloud enters the hot point.</li>
+									<li>to create a fully featured air drum kit, we need to have multiple hot points
+										that trigger multiple different sounds. </li>
+							</ul>
+						</section>
+						<section>
+							<h2>ADDING AUDIO WITH MINIM</h2>
+							<ul>
+								<li>Using Minim, you can synthesize your own sounds, create generative
+									melodies, and, most relevant for us, play back existing sound files
+									like MP3s, WAVs, and AIFFs.</li>
+									<li>Start attaching Minim to our point cloud code to give our air drums some sounds.</li>
+							</ul>
+						</section>
+						<section data-markdown>
+								## AUDIO CODE
+								```
+								import ddf.minim.*;
+								Minim minim;
+								AudioSnippet player;
+								void setup() {
+									minim = new Minim(this);
+									player = minim.loadSnippet("kick.wav");
+									player.play();
+								}
+								void draw() {
+								}
+								void stop()
+								{
+									player.close();
+									minim.stop();
+									super.stop();
+								}
+								```
+						</section>
+						<section>
+							<h2>AUDIO CODE</h2>
+							<ul>
+								<li>The minim object will setup Minim to use in general.</li>
+								<li>Player is an instance of the AudioSnippet class, which is used
+									for playing short sound files like our drum samples.</li>
+							</ul>
+						</section>
+						<section>
+							<h2>HOT POINTS</h2>
+							<ul>
+								<li>Each hot point needs to be either entirely on or entirely off.</li>
+								<li>Once there’s a certain number of points inside of its cube, the hot point
+									will count as on.</li>
+							</ul>
+						</section>
+						<section>
+							<h2>HOT POINTS</h2>
+							<ul>
+								<li>Applying a threshold will be enough to turn our hot point into a sound- triggering
+									button. However, our code will have to be more complicated than a simple if statement. </li>
+								<li>In other words, we want to trigger our sound only when our hot point goes from
+									having no part of the point cloud inside of it to having at least one point inside.</li>
+							</ul>
+						</section>
+						<section>
+							<h2>HOT POINTS</h2>
+							<ul>
+								<li>We’ll need two new Boolean variables, one keeping track of whether there are currently
+										any points inside the cube and one keeping track of whether there just were any last time we checked.</li>
+							</ul>
+						</section>
+						<section data-markdown>
+								## CODE
+								```
+								import processing.opengl.*;
+								import SimpleOpenNI.*;
+								import ddf.minim.*;
+								// minim objects
+								Minim minim;
+								AudioSnippet player;
+								SimpleOpenNI kinect;
+								float rotation = 0;
+								// used for edge detection
+								boolean wasJustInBox = false;
+								int boxSize = 150;
+								PVector boxCenter = new PVector(0, 0, 600);
+								float s = 1;
+								void setup() {
+									size(1024, 768, OPENGL);
+									kinect = new SimpleOpenNI(this);
+									kinect.enableDepth();
+									// initialize Minim
+									// and AudioPlayer
+									minim = new Minim(this);
+									player = minim.loadSnippet("kick.wav");
+								}
+								void draw() {
+									background(0);
+									kinect.update();
+									translate(width/2, height/2, -1000);
+									rotateX(radians(180));
+									translate(0, 0, 1400);
+									rotateY(radians(map(mouseX, 0, width, -180, 180)));
+									translate(0, 0, s*-1000);
+									scale(s);
+									stroke(255);
+									PVector[] depthPoints = kinect.depthMapRealWorld();
+									int depthPointsInBox = 0;
+									for (int i = 0; i < depthPoints.length; i+=10) {
+										PVector currentPoint = depthPoints[i];
+										if (currentPoint.x > boxCenter.x -boxSize/2 &&
+										currentPoint.x < boxCenter.x + boxSize/2) {
+										if (currentPoint.y > boxCenter.y - boxSize/2 &&
+										currentPoint.y < boxCenter.y + boxSize/2) {
+											if (currentPoint.z > boxCenter.z - boxSize/2 &&
+											currentPoint.z < boxCenter.z + boxSize/2) {
+												depthPointsInBox++;
+											}
+										}
+									}
+									point(currentPoint.x, currentPoint.y, currentPoint.z);
+								}
+								float boxAlpha = map(depthPointsInBox, 0, 1000, 0, 255);
+								// edge detection
+								// are we in the box this time
+								boolean isInBox = (depthPointsInBox > 0);
+								// if we just moved in from outside
+								// start it playing
+								if (isInBox && !wasJustInBox) {
+									player.play();
+								}
+								// if it's played all the way through
+								// pause and rewind
+								if (!player.isPlaying()) {
+									player.rewind();
+									player.pause();
+								}
+								// save current status
+								// for next time
+								wasJustInBox = isInBox;
+								translate(boxCenter.x, boxCenter.y, boxCenter.z);
+								fill(255, 0, 0, boxAlpha);
+								stroke(255, 0, 0);
+								box(boxSize);
+							}
+							void stop()
+							{
+								player.close();
+								minim.stop();
+								super.stop();
+							}
+							// use keys to control zoom
+							// up-arrow zooms in
+							// down arrow zooms out
+							// s gets passed to scale() in draw()
+							void keyPressed() {
+								if (keyCode == 38) {
+									s = s + 0.01;
+								}
+								if (keyCode == 40) {
+									s = s - 0.01;
+								}
+							}
+								```
+						</section>
+						<section>
+							<h2>Cubes</h2>
+							<p>Displays a cube, and fades the color of that cube based on how much
+								of the point cloud is inside the cube. </p>
+						</section>
+						<section>
+							<h2>HOTPOINT CLASS</h2>
+							<p>Instead of needing an additional set of variables for each hot point,
+								we’ll just create an instance of our class. And our class can also provide
+								a bunch of functions that make it convenient to do common tasks that hot
+								points need to do, like drawing cubes on the screen.</p>
+						</section>
+						<section data-markdown>
+								## CODE WITHOUT HOTPOINT CLASS
+								```
+								import processing.opengl.*;
+								import SimpleOpenNI.*;
+								import ddf.minim.*;
+								SimpleOpenNI kinect;
+								float rotation = 0;
+								// two AudioSnippet objects this time
+								Minim minim;
+								AudioSnippet kick;
+								AudioSnippet snare;
+								// declare our two hotpoint objects
+								Hotpoint snareTrigger;
+								Hotpoint kickTrigger;
+								float s = 1;
+								void setup() {
+									size(1024, 768, OPENGL);
+									kinect = new SimpleOpenNI(this);
+									kinect.enableDepth();
+									minim = new Minim(this);
+									// load both audio files
+									snare = minim.loadSnippet("hat.wav");
+									kick = minim.loadSnippet("kick.wav");
+									// initialize hotpoints with their origins (x,y,z) and their size
+									snareTrigger = new Hotpoint(200, 0, 600, 150);
+									kickTrigger = new Hotpoint(-200, 0, 600, 150);
+								}
+								void draw() {
+									background(0);
+									kinect.update();
+									translate(width/2, height/2, -1000);
+									rotateX(radians(180));
+									translate(0, 0, 1400);
+									rotateY(radians(map(mouseX, 0, width, -180, 180)));
+									translate(0, 0, s*-1000);
+									scale(s);
+									stroke(255);
+									PVector[] depthPoints = kinect.depthMapRealWorld();
+									for (int i = 0; i < depthPoints.length; i+=10) {
+										PVector currentPoint = depthPoints[i];	// have each hotpoint check to see if it includes the currentPoint
+										snareTrigger.check(currentPoint);
+										kickTrigger.check(currentPoint);
+										point(currentPoint.x, currentPoint.y, currentPoint.z);
+									}
+									println(snareTrigger.pointsIncluded);
+									if(snareTrigger.isHit()) { 7
+										snare.play();
+									}
+									if(!snare.isPlaying()) {
+										snare.rewind();
+									}
+									if (kickTrigger.isHit()) {
+										kick.play();
+									}
+									if(!kick.isPlaying()) {
+										kick.rewind();
+									}
+									// display each hotpoint and clear its points
+									snareTrigger.draw();
+									snareTrigger.clear();
+									kickTrigger.draw();
+									kickTrigger.clear();
+								}
+								void stop()
+								{
+									// make sure to close
+									// both AudioPlayer objects
+									kick.close();
+									snare.close();
+									minim.stop();
+									super.stop();
+								}
+								void keyPressed() {
+									if (keyCode == 38) {
+										s = s + 0.01;
+									}
+									if (keyCode == 40) {
+										s = s - 0.01;
+									}
+								}
+								```
+						</section>
+						<section>
+							<h2>PARAMS OF HOTPOINTS</h2>
+							<p>Creating each Hotpoint takes four arguments. The first three represent
+								the x-, y-, and z-coordinates of the hot point’s center.</p>
+						</section>
+						<section data-markdown>
+								## CODE WITH HOTPOINT CLASS
+								```
+								class Hotpoint {
+								PVector center;
+								color fillColor;
+								color strokeColor;
+								int size;
+								int pointsIncluded;
+								int maxPoints;
+								boolean wasJustHit;
+								int threshold;
+								Hotpoint(float centerX, float centerY, float centerZ, int boxSize) {
+								center = new PVector(centerX, centerY, centerZ);
+								size = boxSize;
+								pointsIncluded = 0;
+								maxPoints = 1000;
+								threshold = 0;
+								fillColor = strokeColor = color(random(255), random(255), random(255));
+							}
+							void setThreshold( int newThreshold ){
+								threshold = newThreshold;
+							}
+							void setMaxPoints(int newMaxPoints) {
+								maxPoints = newMaxPoints;
+							}
+							void setColor(float red, float blue, float green){
+								fillColor = strokeColor = color(red, blue, green);
+							}
+							boolean check(PVector point) {
+								boolean result = false;
+								if (point.x > center.x - size/2 && point.x < center.x + size/2) {
+									if (point.y > center.y - size/2 && point.y < center.y + size/2) {
+										if (point.z > center.z - size/2 && point.z < center.z + size/2) {
+											result = true;
+											pointsIncluded++;
+										}
+									}
+								}
+								return result;
+							}
+							void draw() {
+								pushMatrix();
+								translate(center.x, center.y, center.z);
+								fill(red(fillColor), blue(fillColor), green(fillColor),
+								255 * percentIncluded());
+								stroke(red(strokeColor), blue(strokeColor), green(strokeColor), 255);
+								box(size);
+								popMatrix();
+							}
+							float percentIncluded() {
+								return map(pointsIncluded, 0, maxPoints, 0, 1);
+							}
+							boolean currentlyHit() {
+								return (pointsIncluded > threshold);
+							}
+							boolean isHit() {
+								return currentlyHit() && !wasJustHit;
+							}
+							void clear() {
+								wasJustHit = currentlyHit();
+								pointsIncluded = 0;
+							}
+						}
+								```
+						</section>
 					</section>
 
 		<script src="lib/js/head.min.js"></script>
