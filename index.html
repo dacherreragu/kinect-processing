@@ -233,8 +233,199 @@
 							<img src="images/2.jpg">
 						</section>
 						<section>
-
+							<h2>ADVANCED VERSION: MULTIPLE IMAGES AND SCALE</h2>
+							<p>Two changes.</p>
+							<ul>
+								<li>It’ll control multiple images. That change is not going to introduce
+									any new concepts, but will simply be a matter of managing more variables
+									to keep track of the location of all of the images and remembering which
+									image the user is currently controlling.</li>
+								<li>We’ll give the user the ability to scale each image up and down by moving
+									her hand closer to or farther from the Kinect. To do this, we’ll need to use
+									closestValue, the actual distance of the closest point detected in the image. </li>
+							</ul>
 						</section>
+						<section data-markdown>
+							## CODE
+							```
+							import SimpleOpenNI.*;
+							SimpleOpenNI kinect;
+
+							int closestValue;
+							int closestX;
+							int closestY;
+
+							float lastX;
+							float lastY;
+
+							float image1X;
+							float image1Y;
+							// declare variables for
+							// image scale and dimensions
+							float image1scale;
+							int image1width = 100;
+							int image1height = 100;
+							float image2X;
+							float image2Y;
+							float image2scale;
+							int image2width = 100;
+							int image2height = 100;
+
+							float image3X;
+							float image3Y;
+							float image3scale;
+							int image3width = 100;
+							int image3height = 100;
+							// keep track of which image is moving
+							int currentImage = 1;
+
+							// declare variables
+							// to store the images
+							PImage image1;
+							PImage image2;
+							PImage image3;
+
+							void setup()
+							{
+								size(640, 480);
+								kinect = new SimpleOpenNI(this);
+								kinect.enableDepth();
+
+								// load the images
+								image1 = loadImage("image1.jpg");
+								image2 = loadImage("image2.jpg");
+								image3 = loadImage("image3.jpg");
+							}
+
+							void draw(){
+								background(0);
+
+								closestValue = 8000;
+
+								kinect.update();
+
+								int[] depthValues = kinect.depthMap();
+
+								for(int y = 0; y < 480; y++){
+									for(int x = 0; x < 640; x++){
+										int reversedX = 640-x-1;
+										int i = reversedX + y * 640;
+										int currentDepthValue = depthValues[i];
+
+										if(currentDepthValue > 610 && currentDepthValue < 1525
+										&& currentDepthValue < closestValue){
+											closestValue = currentDepthValue;
+											closestX = x;
+											closestY = y;
+										}
+									}
+								}
+
+								float interpolatedX = lerp(lastX, closestX, 0.3);
+								float interpolatedY = lerp(lastY, closestY, 0.3);
+
+								// select the current image
+								switch(currentImage){ //1)
+									case 1:
+										// update its x-y coordinates
+										// from the interpolated coordinates
+										image1X = interpolatedX; //2)
+										image1Y = interpolatedY;
+
+										// update its scale
+										// from closestValue
+										// 0 means invisible, 4 means quadruple size
+										image1scale = map(closestValue, 610,1525, 0,4);
+										break;
+									case 2:
+										image2X = interpolatedX;
+										image2Y = interpolatedY;
+										image2scale = map(closestValue, 610,1525, 0,4);
+										break;
+									case 3:
+										image3X = interpolatedX;
+										image3Y = interpolatedY;
+										image3scale = map(closestValue, 610,1525, 0,4);
+										break;
+									}
+
+									// draw all the image on the screen
+									// use their saved scale variables to set their dimensions
+									image(image1,image1X,image1Y,
+									image1width * image1scale, image1height * image1scale); //3)
+									image(image2,image2X,image2Y,
+									image2width * image2scale, image2height * image2scale);
+									image(image3,image3X,image3Y,
+									image3width * image3scale, image3height * image2scale);
+
+									lastX = interpolatedX;
+									lastY = interpolatedY;
+								}
+
+								void mousePressed(){
+									// increase current image
+									currentImage++;
+									// but bump it back down to 0
+									// if it goes above 3
+									if(currentImage > 3){
+										currentImage = 1;
+									}
+									println(currentImage);
+								}
+							```
+							</section>
+							<section>
+								<h2>EXECUTE</h2>
+								<p>To run this code, you’ll need to use three images of your own.</p>
+							</section>
+							<section>
+								<h2>1) HOW DOES THIS SKETCH WORK?</h2>
+								<ul>
+									<li>Once you’ve set up your images, you’ll be ready to run this sketch.
+										Set up your Kinect so that you’re three or four feet away from it and
+										there’s nothing between it and you.</li>
+									<li>First, we’ll look at how this sketch works with multiple images. We’ll
+										see how it remembers where to position each image and how it decides which
+										image should be controlled by your current movements.</li>
+									<li>Then, we’ll move on to looking at how this sketch uses the distance of the
+										closestPoint to scale the images.</li>
+								</ul>
+							</section>
+							<section>
+								<h2>CURRENT IMAGE</h2>
+								<p>How does our draw function use currentImage to decide which image to control?
+									Just keeping currentImage set to the right value doesn’t do anything by itself.
+									We need to use its value to change the position of the corresponding image.</p>
+							</section>
+							<section>
+								<h2>1) SWITCH</h2>
+								<p>With a switch statement, we can choose which image position to update
+									based on the value of our currentImage variable.</p>
+							</section>
+							<section>
+								<h2>2) INTERPOLATION</h2>
+								<p>Inside of each case we use the interpolated value of the closest
+									point to set the x- and y-values of the selected image. Before this point
+									in the sketch, we found the closest point for this run of the sketch and interpolated
+									it with the most recent value to create a smoothly moving position.</p>
+							</section>
+							<section>
+								<h2>3) CHANGE IN NOT CURRENT IMAGES</h2>
+								<p>The images that aren’t current will have their x- and y-coordinates un- changed.</p>
+							</section>
+							<section>
+								<h2>SICE OF IMAGES</h2>
+								<ul>
+									<li>Processing’s image function lets us set the size to display each image by passing
+										in a width and a height</li>
+									<li>When the user is controlling an image, we’ll use the depth of the
+										closest pixel to scale these values up and down.</li>
+									<li>Only update the scale of the image that the user is actively controlling so the
+										other images will stick at whatever size the user left them.</li>
+									<li>When we call image, we’ll pass in the scaled values for each image’s width and
+										height to set them to the right size. </li>
+								</ul>
+							</section>
 					</section>
 					<section>
 					</section>
