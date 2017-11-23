@@ -69,7 +69,6 @@
 					<h2>INDEX</h2>
 					<ol>
 						<li class="fragment"><a href="#/3">Minority report photos</a></li>
-						<li class="fragment">Prueba</li>
 					</ol>
 				</section>
 
@@ -196,8 +195,10 @@
 							<h2>1) HOW DOES THIS SKETCH WORK?</h2>
 							<ul>
 								<li>Declaring and loading an image</li>
-								<li class="fragment"> image1X and image1Y, which will hold the position of our image and a Boolean called imageMoving, which will keep track of whether or not the user has “dropped” the image.</li>
-								<li class="fragment">If image-Moving is true, clicking the mouse
+								<li> image1X and image1Y, which will hold the position
+									of our image and a Boolean called imageMoving, which will keep
+									track of whether or not the user has “dropped” the image.</li>
+								<li>If image-Moving is true, clicking the mouse
 									will set it to false, and vice versa. That way the mouse button
 									will act to drop the image if the user is currently moving it
 									around and to start it moving around again if it’s dropped.</li>
@@ -208,11 +209,11 @@
 							<ul>
 								<li>If our imageMoving variable is true, we update our image’s x-y
 									coordinates based on interpolatedX and interpolatedY.</li>
-								<li class="fragment">We draw the image using those coordinates whether
+								<li>We draw the image using those coordinates whether
 									or not it is currently being moved.</li>
-								<li class="fragment">If the image is being moved, image1X and image1Y
+								<li>If the image is being moved, image1X and image1Y
 									will always be set to the most recent values of interpolatedX and interpolatedY.</li>
-								<li class="fragment"> When you click the mouse and set imageMoving to false,
+								<li> When you click the mouse and set imageMoving to false,
 									image1X and image1Y will stop updating from the interpolated coordinates.
 									However, we’ll still go ahead and draw the image using the most recent
 									values of image1X and image1Y.</li>
@@ -220,10 +221,12 @@
 						</section>
 						<section>
 							<h2>3) CLEAR THE WHOLE SKETCH TO BLACK</h2>
-							<li>If we didn’t do that, we’d end up seeing trails of our image as we moved it around.</li>
-							<li class="fragment">Processing always just draws on top of whatever is already there.</li>
-							<li class="fragment">If we don’t clear our sketch to black, we’ll end up constantly displaying
+							<ul>
+								<li>If we didn’t do that, we’d end up seeing trails of our image as we moved it around.</li>
+								<li>Processing always just draws on top of whatever is already there.</li>
+								<li>If we don’t clear our sketch to black, we’ll end up constantly displaying
 								the image on top of old copies of itself in slightly different positions.</li>
+							</ul>
 						</section>
 						<section>
 							<h2>CLEAR THE WHOLE SKETCH TO BLACK</h2>
