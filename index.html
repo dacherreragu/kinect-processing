@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>Point Cloud</title>
+		<title>Kinect and Processing</title>
 
 		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
 		<meta name="author" content="Hakim El Hattab">
@@ -60,7 +60,6 @@
 
 				<section>
 					<h1>KINECT AND PROCESSING</h1>
-					<h3>POINT CLOUD</h3>
 					<p>
 						<small>Created by <a href="https://chala8.github.io" target=”_blank”>Daniel Chala</a> / <a href="https://dacherreragu.github.io/" target=”_blank”>David Herrera</a></small>
 					</p>
@@ -69,301 +68,168 @@
 				<section>
 					<h2>INDEX</h2>
 					<ol>
-						<li class="fragment"><a href="#/3">Kinect</a></li>
-						<li class="fragment"><a href="#/4">Processing </a></li>
-						<li class="fragment"><a href="#/5">Point Cloud</a></li>
+						<li class="fragment"><a href="#/3">Minority report photos</a></li>
 					</ol>
 				</section>
 
 				<section>
 					<section>
-						<h1>KINECT</h1>
+						<h1>MINORITY REPORT PHOTOS</h1>
 					</section>
 					<section>
-						<h2>KINECT</h2>
-						<img src="images/kinect.png">
-					</section>
-					<section>
-						<h2>OVERVIEW</h2>
-						<p>The Microsoft Kinect sensor is a peripheral device that functions much like a webcam. However, in addition to providing an RGB image, it also provides a depth map. Meaning for every pixel seen by the sensor, the Kinect measures distance from the sensor.</p>
-					</section>
-					<section>
-						<h2>HOW DOES KINECT WORKS?</h2>
-						<p>The Kinect sensor itself only measures color and depth.</p>
-						<div class="fragment">Once that information is on your computer, lots more can be done like “skeleton” tracking.</div>
-					</section>
-					<section>
-						<h2>SKELETON TRACKING</h2>	
-						<p><span class="fragment">Windows: </span> <span class="fragment"><a href="https://github.com/ThomasLengeling/KinectPV2" target=”_blank”>Thomas Lengling’s windows-only Kinect v2 processing libray</a>.</span>
-						<div class="fragment">Mac: </div> <span class="fragment"><a href="https://github.com/OpenKinect/libfreenect" target=”_blank”>libfreenect</a> and <a href="https://github.com/OpenKinect/libfreenect2" target=”_blank”>libfreenect2</a>.</span>
-						</p>					
-					</section>
-					<section>
-						<h2>HARDWARE</h2>	
-						<p><span class="fragment">Standalone Kinect Sensor v1.</span>
-						<div class="fragment">Standalone Kinect Sensor v2.</div>
-						</p>					
-					</section>
-				</section>
-
-				<section>
-					<section>
-						<h1>PROCESSING</h1>
-					</section>
-					<section>
-						<h2>PROCESSING</h2>
-						<img src="images/processing.png">
+						<h2>MINORITY REPORT PHOTOS</h2>
+						<img src="images/1.jpg">
 					</section>
 					<section>
 						<h2>OVERVIEW</h2>
-						<p><a href="https://processing.org/" target="_blank">Processing</a> is an open source programming language and environment for people who want to create images, animations, and interactions.</p>
+						<p>In the 2002 sci-fi movie Minority Report (based on a Philip K. Dick short story),
+							Tom Cruise played a “pre crime” policeman who uses the predictions of psychics to
+							anticipate and prevent violent crimes. Cruise accesses these predictions as a series
+							of images on a projected screen that he navigates with gestures. He drags his hands to
+							pull in new images, spreads them apart to zoom in on a telling detail, pinches to zoom out to the big picture.</p>
 					</section>
 					<section>
-						<h2>START WITH KINECT IN PROCESSING</h2>
-						<p>The easiest way to install the library is with the <a href="https://processing.org/reference/environment/#Extensions" target="_blank">Processing Contributions Manager</a> Sketch → Import Libraries → Add library and search for “Kinect”. A button will appear labeled “install”.
-						<br>
-						Then, restart Processing.</p>
+						<h2>BASIC VERSION: ONE IMAGE</h2>
+						<p>We need to give the user the ability to “drop” the image, to stop it moving by clicking the mouse.</p>
 					</section>
-					<section data-markdown>
-						## CODE
-						First thing is to include the proper import statements at the top of your code.
-						```
-						import org.openkinect.processing.*;
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						As well as a reference to a Kinect object, i.e.
-						```
-						Kinect kinect;
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						Then in setup() you can initialize that kinect object:
-						```
-						void setup() {
-  							kinect = new Kinect(this);
-  							kinect.initDevice();
-						}
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						If you are using a Kinect v2, use a Kinect2 object instead.
-						```
-						Kinect2 kinect2;
+					<section>
+						<section data-markdown>
+							## CODE
+							```
+							import SimpleOpenNI.*;
+							SimpleOpenNI kinect;
 
-						void setup() {
-  							kinect2 = new Kinect2(this);
-  							kinect2.initDevice();
-						}
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						Once you’ve done this you can begin to access data from the kinect sensor. 
-						```
-						PImage (RGB) from the kinect video camera.
-						PImage (grayscale) from the kinect IR camera.
-  						PImage (grayscale) with each pixel’s brightness mapped to depth (brighter = closer).
-						PImage (RGB) with each pixel’s hue mapped to depth.
-						int[] array with raw depth data (11 bit numbers between 0 and 2048).
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						If you want to use the Kinect just like a regular old webcam, you can access the video image as a PImage!
-						```
-						PImage img = kinect.getVideoImage();
-						image(img, 0, 0);
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						If you want the IR image:
-						```
-						void videoEvent(Kinect k) {
- 							// There has been a video event!
-						}
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						If you want the IR image:
-						```
-						kinect.enableIR(true);
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						With kinect v1 cannot get both the video image and the IR image. They are both passed back via getVideoImage() so whichever one was most recently enabled is the one you will get. However, with the Kinect v2, they are both available as separate methods:
-						```
-						PImage video = kinect2.getVideoImage();
-						PImage ir = kinect2.getIrImage();
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						If you want the depth image, you can request the grayscale image:
-						```
-						PImage img = kinect.getDepthImage();
-						image(img, 0, 0);
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						As well as the raw depth data:
-						For the kinect v1, the raw depth values range between 0 and 2048, for the kinect v2 the range is between 0 and 4500.
-						```
-						int[] depth = kinect.getRawDepth();
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						For the color depth image, use kinect.enableColorDepth(true);. And just like with the video image, there’s a depth event you can access if necessary.
-						```
-						void depthEvent(Kinect k) {
- 							// There has been a depth event!
-						}
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						Unfortunately, b/c the RGB camera and the IR camera are not physically located in the same spot, there is a stereo vision problem.
-						The Kinect v2 offers what’s called a “registered” image which aligns all the depth values with the RGB camera ones. This can be accessed as follows:
-						```
-						PImage img = kinect2.getRegisteredImage()
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						Finally, for kinect v1 (but not v2), you can also adjust the camera angle with the  setTilt() method.
-						```
-						float angle = kinect.getTilt();
-						angle = angle + 1;
-						kinect.setTilt(angle);
-						```
-					</section>
-					<section data-markdown>
-						## CODE
-						Here are all the useful functions you might need to use the Processing kinect library:
-						```
-						initDevice() — start everything (video, depth, IR)
-						activateDevice(int) - activate a specific device when multiple devices are connect
-						initVideo() — start video only
-						enableIR(boolean) — turn on or off the IR camera image (v1 only)
-						initDepth() — start depth only
-						enableColorDepth(boolean) — turn on or off the depth values as color image
-						enableMirror(boolean) — mirror the image and depth data (v1 only)
-						PImage getVideoImage() — grab the RGB (or IR for v1) video image
-						PImage getIrImage() — grab the IR image (v2 only)
-	     				PImage getDepthImage() — grab the depth map image
-						PImage getRegisteredImage() — grab the registered depth image (v2 only)
-						int[] getRawDepth() — grab the raw depth data
-						float getTilt() — get the current sensor angle (between 0 and 30 degrees) (v1 only)
-						setTilt(float) — adjust the sensor angle (between 0 and 30 degrees) (v1 only)
-						```
-					</section>
-				</section>
-				<section>
-					<section>
-						<h1>POINT CLOUD</h1>
-					</section>
-					<section>
-						<h2>Overview</h2>
-						<p>We’re using the 3D capabilities of Processing to draw points in space.</p>
-						<div class="fragment">You’ll want to familiarize yourself with:</div>
-						<div class="fragment" data-markdown>
-							```
-							translate()
-							rotate()
-							pushMatrix()
-							popMatrix()
-							```
-						</div>
-					</section>
-					<section>
-						<h2>Raw depth values</h2>
-						<p>Rather than do this calculation all the time, we can precompute all of these values in a lookup table since there are only 2048 depth values.</p>
-						<div class="fragment" data-markdown>
-							```
-							depthInMeters = 1.0 / (rawDepth * -0.0030711016 + 3.3309495161);
-							```
-						</div>
-					</section>
-					<section>
-						<h2>Raw depth values</h2>
-						<p>The raw depth values from the kinect are not directly proportional to physical depth. Rather, they scale with the inverse of the depth according to this formula:</p>
-						<div class="fragment" data-markdown>
-							```
-							float[] depthLookUp = new float[2048];
+							int closestValue;
+							int closestX;
+							int closestY;
 
-							for (int i = 0; i < depthLookUp.length; i++) {
-  								depthLookUp[i] = rawDepthToMeters(i);
+							float lastX;
+							float lastY;
+
+							// declare x-y coordinates for the image
+							float image1X;
+							float image1Y;
+
+							// declare a boolean to store whether or not the image is moving
+							boolean imageMoving;
+
+							// declare a variable
+							// to store the image
+							PImage image1; //1)
+
+							void setup()
+							{
+								size(640, 480);
+								kinect = new SimpleOpenNI(this);
+								kinect.enableDepth();
+
+								// start the image out moving
+								// so mouse press will drop it
+								imageMoving = true;
+
+								// load the image from a file
+								image1 = loadImage("image1.jpg");
+
+								background(0);
 							}
-							float rawDepthToMeters(int depthValue) {
-  								if (depthValue < 2047) {
-    									return (float)(1.0 / ((double)(depthValue) * -0.0030711016 + 3.3309495161));
-  								}
-  								return 0.0f;
+
+							void draw()
+							{
+								closestValue = 8000;
+
+								kinect.update();
+
+								int[] depthValues = kinect.depthMap();
+
+								for(int y = 0; y < 480; y++){
+									for(int x = 0; x < 640; x++){
+										int reversedX = 640-x-1;
+										int i = reversedX + y * 640;
+										int currentDepthValue = depthValues[i];
+
+										if(currentDepthValue > 610
+										&& currentDepthValue < 1525
+										&& currentDepthValue < closestValue) //2)
+										{
+											closestValue = currentDepthValue;
+											closestX = x;
+											closestY = y;
+										}
+									}
+								}
+
+								float interpolatedX = lerp(lastX, closestX, 0.3);
+								float interpolatedY = lerp(lastY, closestY, 0.3);
+
+								// clear the previous drawing
+								background(0); //3)
+
+								// only update image position
+								// if image is in moving state
+								if(imageMoving){
+									image1X = interpolatedX;
+									image1Y = interpolatedY;
+								}
+
+								//draw the image on the screen
+								image(image1,image1X,image1Y);
+
+								lastX = interpolatedX;
+								lastY = interpolatedY;
+							}
+
+							void mousePressed(){
+								// if the image is moving, drop it
+								// if the image is dropped, pick it up
+								imageMoving = !imageMoving;
 							}
 							```
-						</div>
+						</section>
+						<section>
+							<h2>EXECUTE</h2>
+							<p>Once you’ve added your image, run the sketch and you should see
+								your image floating around the screen, following your outstretched hand.</p>
+						</section>
+						<section>
+							<h2>1) HOW DOES THIS SKETCH WORK?</h2>
+							<ul>
+								<li>Declaring and loading an image</li>
+								<li class="fragment"> image1X and image1Y, which will hold the position
+									of our image and a Boolean called imageMoving, which will keep
+									track of whether or not the user has “dropped” the image.</li>
+								<li class="fragment">If image-Moving is true, clicking the mouse
+									will set it to false, and vice versa. That way the mouse button
+									will act to drop the image if the user is currently moving it
+									around and to start it moving around again if it’s dropped.</li>
+							</ul>
+						</section>
+						<section>
+							<h2>2) AFTER INTERPOLATE</h2>
+							<ul>
+								<li>If our imageMoving variable is true, we update our image’s x-y
+									coordinates based on interpolatedX and interpolatedY.</li>
+								<li class="fragment">We draw the image using those coordinates whether
+									or not it is currently being moved.</li>
+								<li class="fragment">If the image is being moved, image1X and image1Y
+									will always be set to the most recent values of interpolatedX and interpolatedY.</li>
+								<li class="fragment"> When you click the mouse and set imageMoving to false,
+									image1X and image1Y will stop updating from the interpolated coordinates.
+									However, we’ll still go ahead and draw the image using the most recent
+									values of image1X and image1Y.</li>
+							</ul>
+						</section>
+						<section>
+							<h2>3) CLEAR THE WHOLE SKETCH TO BLACK</h2>
+							<li>If we didn’t do that, we’d end up seeing trails of our image as we moved it around.</li>
+							<li class="fragment">Processing always just draws on top of whatever is already there.</li>
+							<li class="fragment">f we don’t clear our sketch to black, we’ll end up constantly displaying
+								the image on top of old copies of itself in slightly different positions.</li>
+						</section>
+						<section>
+							<h2>CLEAR THE WHOLE SKETCH TO BLACK</h2>
+							<img src="images/1.jpg">
+						</section>
 					</section>
-					<section>
-						<h2>Raw depth values</h2>
-						<p>Thanks to <a href="http://graphics.stanford.edu/~mdfisher/Kinect.html" target="_blank">Matthew Fisher</a> for the above formula.</p>
-						<p><span class="fragment">Note:</span> <span class="fragment">For the results to be more accurate, you would need to calibrate your specific kinect device.</span></p>
-					</section>
-					<section>
-						<h2>Point cloud</h2>
-						<p>Finally, we can draw some points based on the depth values in meters:</p>
-						<div class="fragment" data-markdown>
-							```
-							for(int x = 0; x < w; x += skip) {
-    								for(int y = 0; y < h; y += skip) {
-     							 		int offset = x + y * kinect.width;
-
-      									// Convert kinect data to world xyz coordinate
-      									int rawDepth = depth[offset];
-      									PVector v = depthToWorld(x, y, rawDepth);
-
-      									stroke(255);
-     									pushMatrix();
-      									// Scale up by 200
-     									float factor = 200;
-      									translate(v.x * factor, v.y * factor, factor-v.z * factor);
-      									// Draw a point
-      									point(0,0);
-      									popMatrix();
-    								}
-  							}
-							```
-						</div>
-					</section>
-					<section>
-						<h2>Obtained result</h2>
-						<img src="images/result.png">
-					</section>
-					<section>
-						<h2>Related video</h2>
-						<p>The following video is a great resource for this implementation:</p>
-						<iframe width="600" height="400" src="https://www.youtube.com/embed/E1eIg54clGo" frameborder="0" allowfullscreen class="fragment"></iframe>
-					</section>
-				</section>
-				<section>
-					<section>
-						<h2>References</h2>
-						<ul>
-							<li class="fragment"><a href="https://es.wikipedia.org/wiki/Kinect" target="_blank">Kinect</a>.</li>
-							<li class="fragment"><a href="https://processing.org/" target="_blank">Processing</a>.</li>
-							<li class="fragment"><a href="http://shiffman.net/p5/kinect/" target="_blank">Getting Started with Kinect and Processing</a>.</li>
-						</ul>
-					</section>
-				</section>
-			</div>
-		</div>
 
 		<script src="lib/js/head.min.js"></script>
 		<script src="js/reveal.js"></script>
